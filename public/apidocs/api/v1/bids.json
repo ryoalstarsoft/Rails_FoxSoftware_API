@@ -1,0 +1,284 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://localhost:3000/",
+  "resourcePath": "bids",
+  "apis": [
+    {
+      "path": "api/v1/bids.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            },
+            {
+              "paramType": "query",
+              "name": "shipment_id",
+              "type": "string",
+              "description": "Scope by shipment ID",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            }
+          ],
+          "summary": "LIST all current user bids",
+          "notes": "Sorted by newest at the top",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "Bid",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Bids#index"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/bids.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true
+            },
+            {
+              "paramType": "form",
+              "name": "bid[price]",
+              "type": "double",
+              "description": {
+                "desc": "Offered price"
+              },
+              "required": true
+            },
+            {
+              "paramType": "form",
+              "name": "bid[shipment_id]",
+              "type": "integer",
+              "description": {
+                "desc": "Shipment ID"
+              },
+              "required": true
+            }
+          ],
+          "summary": "CREATE a Bid",
+          "notes": "This endpoint provide creation of new bid for shipment. Only user with <strong>carrier</strong> role can do this.",
+          "responseMessages": [
+            {
+              "code": "end_auction_date",
+              "responseModel": null,
+              "message": "Shipment auction date due"
+            },
+            {
+              "code": "limit_reached",
+              "responseModel": null,
+              "message": "When user reached bid limit on this shipment. Current quota: 99999"
+            },
+            {
+              "code": "no_access",
+              "responseModel": null,
+              "message": "User can't bid on this shipment, no invitation for private bidding"
+            },
+            {
+              "code": "not_in_auction",
+              "responseModel": null,
+              "message": "Shipment not in auction state"
+            },
+            {
+              "code": "not_saved",
+              "responseModel": null,
+              "message": "Bad price or shipment is not active"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "method": "post",
+          "nickname": "Api::V1::Bids#create"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/bids/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true
+            },
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Bid ID",
+              "required": true
+            }
+          ],
+          "summary": "LOAD a bid",
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": "Bid",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Bids#show"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/bids/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true
+            }
+          ],
+          "method": "patch",
+          "nickname": "Api::V1::Bids#update"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "Bid": {
+      "id": "Bid",
+      "required": [
+        "shipment_id",
+        "price"
+      ],
+      "properties": {
+        "shipment_id": {
+          "type": "integer",
+          "description": "Shipment ID"
+        },
+        "price": {
+          "type": "double",
+          "description": "Offered price"
+        },
+        "user[id]": {
+          "type": "integer",
+          "description": "ID"
+        },
+        "user[name]": {
+          "type": "string",
+          "description": "NAME"
+        }
+      },
+      "description": "Bid object"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+roles:
+  - :user
+  - :admin
+  - :shipper
+  - :carrier
+default_role: :user
+index_list: 10
+default_email_from: no-reply@example.com
+host: http://foxlmp-dev:3000
+proposal_limit: 99999
+edit_rating_due: 90

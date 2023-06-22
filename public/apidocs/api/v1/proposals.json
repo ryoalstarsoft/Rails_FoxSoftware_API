@@ -1,0 +1,328 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://foxsoftware.herokuapp.com/",
+  "resourcePath": "proposals",
+  "apis": [
+    {
+      "path": "api/v1/proposals/{id}/reject.json",
+      "operations": [
+        {
+          "summary": "REJECT proposal by carrier",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Proposal ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Proposal not found with that user"
+            },
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "Can't reject at this status"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "notes": "        Reject a proposal by current_user(must be a carrier).<br/>\n        Shipper will get notification and proposal status became rejected.<br/>\n        Shipment status will drop to 'proposing' if any other than proposing.<br/>\n        Rejection possible only when shipment in negotiation status.\n",
+          "method": "put",
+          "nickname": "Api::V1::Proposals#reject"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/proposals/{id}/cancel.json",
+      "operations": [
+        {
+          "summary": "CANCEL proposal by shipper",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Proposal ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Proposal not found in current user shipments, will add shipment status in 'message'"
+            },
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "Can't reject at this status"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "notes": "        Cancel proposal, similar as #reject but can be only set by shipper.<br/>\n        Can be only set when shipment is in 'pending' status(before 'confirming')\n",
+          "method": "put",
+          "nickname": "Api::V1::Proposals#cancel"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/proposals.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            },
+            {
+              "paramType": "query",
+              "name": "shipment_id",
+              "type": "string",
+              "description": "Scope by shipment ID",
+              "required": false
+            }
+          ],
+          "summary": "LIST all current user proposals",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "Proposal",
+              "message": "Success"
+            }
+          ],
+          "notes": "Sorted by newest at the top",
+          "method": "get",
+          "nickname": "Api::V1::Proposals#index"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/proposals.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "form",
+              "name": "proposal[price]",
+              "type": "double",
+              "description": {
+                "desc": "Offered price"
+              },
+              "required": true
+            },
+            {
+              "paramType": "form",
+              "name": "proposal[shipment_id]",
+              "type": "integer",
+              "description": {
+                "desc": "Shipment ID"
+              },
+              "required": true
+            },
+            {
+              "paramType": "form",
+              "name": "proposal[equipment_type]",
+              "type": "string",
+              "description": {
+                "desc": "Equipment type"
+              },
+              "required": true
+            }
+          ],
+          "summary": "CREATE proposal",
+          "responseMessages": [
+            {
+              "code": "end_auction_date",
+              "responseModel": null,
+              "message": "Shipment auction date due"
+            },
+            {
+              "code": "limit_reached",
+              "responseModel": null,
+              "message": "When user reached proposal limit on this shipment. Current quota: 99999"
+            },
+            {
+              "code": "no_access",
+              "responseModel": null,
+              "message": "User can't proposal on this shipment, no invitation for private proposing"
+            },
+            {
+              "code": "not_in_auction",
+              "responseModel": null,
+              "message": "Shipment not in auction state"
+            },
+            {
+              "code": "not_saved",
+              "responseModel": null,
+              "message": "Bad price or shipment is not active"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "notes": "This endpoint provide creation of new proposal for shipment. Only user with <strong>carrier</strong> role can do this.",
+          "method": "post",
+          "nickname": "Api::V1::Proposals#create"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/proposals/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Proposal ID",
+              "required": true
+            }
+          ],
+          "summary": "LOAD proposal",
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": "Proposal",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Proposals#show"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "Proposal": {
+      "id": "Proposal",
+      "required": [
+        "shipment_id",
+        "price"
+      ],
+      "properties": {
+        "shipment_id": {
+          "type": "integer",
+          "description": "Shipment ID"
+        },
+        "price": {
+          "type": "double",
+          "description": "Offered price"
+        },
+        "user[id]": {
+          "type": "integer",
+          "description": "ID"
+        },
+        "user[name]": {
+          "type": "string",
+          "description": "NAME"
+        }
+      },
+      "description": "Proposal object"
+    }
+  }
+}

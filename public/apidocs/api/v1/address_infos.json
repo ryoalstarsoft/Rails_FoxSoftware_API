@@ -1,0 +1,605 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://foxsoftware.herokuapp.com/",
+  "resourcePath": "address_infos",
+  "apis": [
+    {
+      "path": "api/v1/address_infos/{id}/set_as_default_shipper.json",
+      "operations": [
+        {
+          "summary": "Set address as default ShipperInfo",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "AddressInfo ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "When trying to set receiver address"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "Success"
+            }
+          ],
+          "notes": "Will be used for all new shipments, can be only one default shipper address",
+          "method": "post",
+          "nickname": "Api::V1::AddressInfos#set_as_default_shipper"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/{id}/set_as_default_receiver.json",
+      "operations": [
+        {
+          "summary": "Set address as default ReceiverInfo",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "AddressInfo ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "When trying to set shipper address"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "Success"
+            }
+          ],
+          "notes": "Will be used for all new shipments, can be only one default receiver address",
+          "method": "post",
+          "nickname": "Api::V1::AddressInfos#set_as_default_receiver"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/my_defaults.json",
+      "operations": [
+        {
+          "summary": "Return user's default addresses",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "{'shipper_info':'not_found', 'receiver_info': {AddressInfoResponseModel}}"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "{'shipper_info':{AddressInfoResponseModel}, 'receiver_info': {AddressInfoResponseModel}"
+            }
+          ],
+          "notes": "Can be in any combination found/not found of ShipperInfo or AddressInfo",
+          "method": "get",
+          "nickname": "Api::V1::AddressInfos#my_defaults"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/my_address.json",
+      "operations": [
+        {
+          "summary": "LOAD current user address",
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Not found, create with #create method"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "{AdressInfoObject}"
+            }
+          ],
+          "notes": "Render current user address(which is not related to shipper or carrier objects)",
+          "method": "get",
+          "nickname": "Api::V1::AddressInfos#my_address"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            }
+          ],
+          "summary": "LIST all AddressInfos",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "AddressInfo",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::AddressInfos#index"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[city]",
+              "type": "string",
+              "description": "City",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[state]",
+              "type": "string",
+              "description": "State (eg: MD)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[address1]",
+              "type": "string",
+              "description": "Address 1",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[address2]",
+              "type": "string",
+              "description": "Address 2",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[zip_code]",
+              "type": "string",
+              "description": "ZIP code(USA 5 digits)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[contact_name]",
+              "type": "string",
+              "description": "Contact name",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[appointment]",
+              "type": "boolean",
+              "description": "Need to schedule appointment for shipment pickup/receive?",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[type]",
+              "type": "string",
+              "description": "Address type, one of: ShipperInfo, ReceiverInfo, UserInfo",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[is_default]",
+              "type": "string",
+              "description": "Set as a default, other objects of same class(ShipperInfo, AddressInfo) will be not default, obv.",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[title]",
+              "type": "string",
+              "description": "Some title for this address, eg: 'My warehouse'",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[fax]",
+              "type": "string",
+              "description": "Fax number",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[company_name]",
+              "type": "string",
+              "description": "Company name",
+              "required": false,
+              "defaultValue": null
+            }
+          ],
+          "summary": "CREATE AddressInfo",
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "'text': [ArrayOfErrors]"
+            },
+            {
+              "code": "ok",
+              "responseModel": "AddressInfo",
+              "message": "{AddressInfoObject}"
+            },
+            {
+              "code": "not_saved",
+              "responseModel": null,
+              "message": "When UserInfo already exists within current user"
+            }
+          ],
+          "notes": "            ShipperInfo - Ship from address<br/>\n            ReceiverInfo - Ship to address<br/>\n            UserInfo - User address<br/>\n",
+          "method": "post",
+          "nickname": "Api::V1::AddressInfos#create"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            }
+          ],
+          "summary": "LOAD AddressInfo",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "AddressInfo",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::AddressInfos#show"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[city]",
+              "type": "string",
+              "description": "City",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[state]",
+              "type": "string",
+              "description": "State (eg: MD)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[address1]",
+              "type": "string",
+              "description": "Address 1",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[address2]",
+              "type": "string",
+              "description": "Address 2",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[zip_code]",
+              "type": "string",
+              "description": "ZIP code(USA 5 digits)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[contact_name]",
+              "type": "string",
+              "description": "Contact name",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[appointment]",
+              "type": "boolean",
+              "description": "Need to schedule appointment for shipment pickup/receive?",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[type]",
+              "type": "string",
+              "description": "Address type, one of: ShipperInfo, ReceiverInfo, UserInfo",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[is_default]",
+              "type": "string",
+              "description": "Set as a default, other objects of same class(ShipperInfo, AddressInfo) will be not default, obv.",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[title]",
+              "type": "string",
+              "description": "Some title for this address, eg: 'My warehouse'",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[fax]",
+              "type": "string",
+              "description": "Fax number",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "address_info[company_name]",
+              "type": "string",
+              "description": "Company name",
+              "required": false,
+              "defaultValue": null
+            }
+          ],
+          "summary": "UPDATE AddressInfo",
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "'text': [ArrayOfErrors]"
+            },
+            {
+              "code": "ok",
+              "responseModel": "AddressInfo",
+              "message": "{AddressInfoObject}"
+            }
+          ],
+          "method": "patch",
+          "nickname": "Api::V1::AddressInfos#update"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/address_infos/{id}.json",
+      "operations": [
+        {
+          "summary": "DELETE an AddressInfo",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "AddressInfo ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "Success"
+            }
+          ],
+          "method": "delete",
+          "nickname": "Api::V1::AddressInfos#destroy"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "AddressInfo": {
+      "id": "AddressInfo",
+      "required": [
+        "city",
+        "state",
+        "address1",
+        "zip_code",
+        "contact_name",
+        "type",
+        "title"
+      ],
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "City"
+        },
+        "state": {
+          "type": "string",
+          "description": "State (eg: MD)"
+        },
+        "address1": {
+          "type": "string",
+          "description": "Address 1"
+        },
+        "address2": {
+          "type": "string",
+          "description": "Address 2"
+        },
+        "zip_code": {
+          "type": "string",
+          "description": "ZIP code(USA 5 digits)"
+        },
+        "contact_name": {
+          "type": "string",
+          "description": "Contact name"
+        },
+        "appointment": {
+          "type": "boolean",
+          "description": "Need to schedule appointment for shipment pickup/receive?"
+        },
+        "type": {
+          "type": "string",
+          "description": "Address type, one of: ShipperInfo, ReceiverInfo, UserInfo"
+        },
+        "is_default": {
+          "type": "string",
+          "description": "Set as a default, other objects of same class(ShipperInfo, AddressInfo) will be not default, obv."
+        },
+        "title": {
+          "type": "string",
+          "description": "Some title for this address, eg: 'My warehouse'"
+        },
+        "fax": {
+          "type": "string",
+          "description": "Fax number"
+        },
+        "company_name": {
+          "type": "string",
+          "description": "Company name"
+        }
+      },
+      "description": "AddressInfo object"
+    }
+  }
+}

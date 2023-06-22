@@ -1,0 +1,1111 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://foxsoftware.herokuapp.com/",
+  "resourcePath": "shipments",
+  "apis": [
+    {
+      "path": "api/v1/shipments/{id}/toggle_active.json",
+      "operations": [
+        {
+          "summary": "Toggle shipment active state",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "Success"
+            }
+          ],
+          "method": "post",
+          "nickname": "Api::V1::Shipments#toggle_active"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}/lowest_proposal.json",
+      "operations": [
+        {
+          "summary": "LOAD proposal with lowest price",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "no_access",
+              "responseModel": null,
+              "message": "Shipping private and user has no access to it"
+            },
+            {
+              "code": "no_proposals",
+              "responseModel": null,
+              "message": "No proposals yet"
+            },
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "No active shipment with this ID"
+            },
+            {
+              "code": "ok",
+              "responseModel": "Proposal",
+              "message": "Success"
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Shipments#lowest_proposal"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}/current_proposals.json",
+      "operations": [
+        {
+          "summary": "LIST all current proposals for shipment",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            },
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "no_access",
+              "responseModel": null,
+              "message": "Shipping private/hidden and user has no access to it"
+            },
+            {
+              "code": "no_proposals",
+              "responseModel": null,
+              "message": "No proposals yet"
+            },
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "No shipment with this ID"
+            },
+            {
+              "code": "ok",
+              "responseModel": "Proposal",
+              "message": "Success"
+            }
+          ],
+          "notes": "For author of shipment will render all proposals, and for viewers will render non-private active shipment proposals",
+          "method": "get",
+          "nickname": "Api::V1::Shipments#current_proposals"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}/set_status.json",
+      "operations": [
+        {
+          "summary": "SET shipment status/transit to",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "status",
+              "type": "string",
+              "description": "New status, lowercase.",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "proposal_id",
+              "type": "integer",
+              "description": "Proposal ID, required for 'propose' and 'confirm' status",
+              "required": false
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "access_denied",
+              "responseModel": null,
+              "message": "Cannot update this shipment, shipment has no invitation for user or not public"
+            },
+            {
+              "code": "bad_proposal_id",
+              "responseModel": null,
+              "message": "No proposal found within shipment scope"
+            },
+            {
+              "code": "bad_role",
+              "responseModel": null,
+              "message": "This user can't switch to this status"
+            },
+            {
+              "code": "bad_status",
+              "responseModel": null,
+              "message": "No such status"
+            },
+            {
+              "code": "bad_transition",
+              "responseModel": null,
+              "message": "Not eligible for transition to this status"
+            },
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Shipment not found"
+            },
+            {
+              "code": "offer_already_made",
+              "responseModel": null,
+              "message": "For 'propose' status, when shipment already has offered proposal"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "notes": "      Transit shipment status to new one, according to current status and current_user role.\n      <strong>Available events:</strong>\n      <table>\n        <thead><th>Status</th><th>Set by</th><th>Explanation</th><th>From statuses</th></thead>\n        <tr><th>auction</th><td>Shipper</td><td>Move from Draft to Auction</td><td>draft</td></tr>\n        <tr><th>pause</th><td>Shipper</td><td>Set shipment to 'draft' and remove all proposals</td><td>offer, auction</td></tr>\n        <tr><th>propose</th><td>Shipper</td><td>Accept proposal(make an offer)</td>td>auction</td></tr>\n        <tr><th>confirm</th><td>Carrier</td><td>Accept above offer.</td><td>propose</td></tr>\n        <tr><th>in_transit</th><td>Carrier</td><td>Mark as in transit</td><td>confirm</td></tr>\n        <tr><th>delivered</th><td>Carrier</td><td>Mark as delivered</td><td>in_transit</td></tr>\n        <!--<tr><th>state</th><td></td><td>role</td><td>explanation</td><td>from statuses</td></tr> -->\n      </table>\n",
+          "method": "post",
+          "nickname": "Api::V1::Shipments#set_status"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}/check_new_proposals.json",
+      "operations": [
+        {
+          "summary": "Check if new proposals has been made since last check",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "2",
+              "responseModel": null,
+              "message": "Return number of new proposals since the last check"
+            }
+          ],
+          "notes": "For shipper users",
+          "method": "get",
+          "nickname": "Api::V1::Shipments#check_new_proposals"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/my_invitations.json",
+      "operations": [
+        {
+          "summary": "LIST all invited shipments for carrier user",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "{'results': [ShipmentObjects]}"
+            }
+          ],
+          "notes": "Find and display all current_user invited shipments in active status",
+          "method": "get",
+          "nickname": "Api::V1::Shipments#my_invitations"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Page",
+              "required": false,
+              "defaultValue": 1
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Results limit",
+              "required": false,
+              "defaultValue": 10
+            },
+            {
+              "paramType": "query",
+              "name": "user_id",
+              "type": "integer",
+              "description": "User ID, if not set then scope by currently logged in user.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "status",
+              "type": "string",
+              "description": "Sort by status name",
+              "required": false
+            }
+          ],
+          "summary": "LIST all user shipments",
+          "responseMessages": [
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "{'results': [ShipmentObjects]}"
+            }
+          ],
+          "notes": "For current user, list owned shipments. When listing with user_id - only public and active shipments will be shown",
+          "method": "get",
+          "nickname": "Api::V1::Shipments#index"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[po]",
+              "type": "string",
+              "description": "PO",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pe]",
+              "type": "string",
+              "description": "PE",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[del]",
+              "type": "string",
+              "description": "Del",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_w]",
+              "type": "double",
+              "description": "Width",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_h]",
+              "type": "double",
+              "description": "Height",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_l]",
+              "type": "double",
+              "description": "Length",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[distance]",
+              "type": "integer",
+              "description": "Distance",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[notes]",
+              "type": "string",
+              "description": "Notes",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[price]",
+              "type": "double",
+              "description": "Price",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[n_of_cartons]",
+              "type": "integer",
+              "description": "Number of cartons",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[cubic_feet]",
+              "type": "integer",
+              "description": "Cubic feet",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[unit_count]",
+              "type": "integer",
+              "description": "Unit count",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[skids_count]",
+              "type": "integer",
+              "description": "Skids count",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[hazard]",
+              "type": "boolean",
+              "description": "Is hazard",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[private_proposing]",
+              "type": "boolean",
+              "description": "Is private auction by link",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[active]",
+              "type": "boolean",
+              "description": "Is active",
+              "required": false,
+              "defaultValue": "true"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[stackable]",
+              "type": "boolean",
+              "description": "Is stackable",
+              "required": false,
+              "defaultValue": "true"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pickup_at_from]",
+              "type": "datetime",
+              "description": "Pickup time(from)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[arrive_at_from]",
+              "type": "datetime",
+              "description": "Arrive time(from)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pickup_at_to]",
+              "type": "datetime",
+              "description": "Pickup time(to), for range",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[arrive_at_to]",
+              "type": "datetime",
+              "description": "Arrive time(to), for range",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[shipper_info_id]",
+              "type": "integer",
+              "description": "ShipperInfo address ID",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[receiver_info_id]",
+              "type": "integer",
+              "description": "ReceiverInfo address ID",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[track_frequency]",
+              "type": "string",
+              "description": "Required tracking frequency update, use: X.INTERVAL, like: 2.hours or 1.day ..",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "invitations[emails]",
+              "type": "array",
+              "description": "Array of emails to invite carriers",
+              "required": false,
+              "items": {
+                "$ref": "email"
+              }
+            },
+            {
+              "paramType": "form",
+              "name": "state",
+              "type": "string",
+              "description": "Initial proposing status, For draft set 'draft'",
+              "required": false,
+              "defaultValue": "proposing"
+            }
+          ],
+          "summary": "CREATE Shipment",
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "'text': [ArrayOfErrors]"
+            },
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "{ShipmentObject}"
+            }
+          ],
+          "notes": "If you want set shipment pickup/arrive range, for example pickup date can be between 1 and 2 July or/and arrive date at 5 July between 12:00 and 18:00, then set both of dates(4 dates in total)",
+          "method": "post",
+          "nickname": "Api::V1::Shipments#create"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "invitation",
+              "type": "string",
+              "description": "Shipment secret code for private shipments",
+              "required": false
+            }
+          ],
+          "summary": "LOAD shipment",
+          "responseMessages": [
+            {
+              "code": "not_eligible",
+              "responseModel": null,
+              "message": "Shipment inactive"
+            },
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "Success"
+            },
+            {
+              "code": "unauthorized",
+              "responseModel": null,
+              "message": "No access to this shipment"
+            }
+          ],
+          "notes": "Only active shipments will be displayed for carriers, or any shipment for shipment user",
+          "method": "get",
+          "nickname": "Api::V1::Shipments#show"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[po]",
+              "type": "string",
+              "description": "PO",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pe]",
+              "type": "string",
+              "description": "PE",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[del]",
+              "type": "string",
+              "description": "Del",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_w]",
+              "type": "double",
+              "description": "Width",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_h]",
+              "type": "double",
+              "description": "Height",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[dim_l]",
+              "type": "double",
+              "description": "Length",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[distance]",
+              "type": "integer",
+              "description": "Distance",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[notes]",
+              "type": "string",
+              "description": "Notes",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[price]",
+              "type": "double",
+              "description": "Price",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[n_of_cartons]",
+              "type": "integer",
+              "description": "Number of cartons",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[cubic_feet]",
+              "type": "integer",
+              "description": "Cubic feet",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[unit_count]",
+              "type": "integer",
+              "description": "Unit count",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[skids_count]",
+              "type": "integer",
+              "description": "Skids count",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[hazard]",
+              "type": "boolean",
+              "description": "Is hazard",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[private_proposing]",
+              "type": "boolean",
+              "description": "Is private auction by link",
+              "required": false,
+              "defaultValue": "false"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[active]",
+              "type": "boolean",
+              "description": "Is active",
+              "required": false,
+              "defaultValue": "true"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[stackable]",
+              "type": "boolean",
+              "description": "Is stackable",
+              "required": false,
+              "defaultValue": "true"
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pickup_at_from]",
+              "type": "datetime",
+              "description": "Pickup time(from)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[arrive_at_from]",
+              "type": "datetime",
+              "description": "Arrive time(from)",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[pickup_at_to]",
+              "type": "datetime",
+              "description": "Pickup time(to), for range",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[arrive_at_to]",
+              "type": "datetime",
+              "description": "Arrive time(to), for range",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[shipper_info_id]",
+              "type": "integer",
+              "description": "ShipperInfo address ID",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[receiver_info_id]",
+              "type": "integer",
+              "description": "ReceiverInfo address ID",
+              "required": true,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "shipment[track_frequency]",
+              "type": "string",
+              "description": "Required tracking frequency update, use: X.INTERVAL, like: 2.hours or 1.day ..",
+              "required": false,
+              "defaultValue": null
+            },
+            {
+              "paramType": "form",
+              "name": "invitations[emails]",
+              "type": "array",
+              "description": "Array of emails to update list of invitations",
+              "required": false,
+              "items": {
+                "$ref": "email"
+              }
+            }
+          ],
+          "summary": "UPDATE Shipment",
+          "responseMessages": [
+            {
+              "code": "not_valid",
+              "responseModel": null,
+              "message": "'text': [ArrayOfErrors]"
+            },
+            {
+              "code": "ok",
+              "responseModel": "Shipment",
+              "message": "{ShipmentObject}"
+            },
+            {
+              "code": "locked_status",
+              "responseModel": null,
+              "message": "Status not eligible to update"
+            },
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Shipment not found"
+            }
+          ],
+          "notes": "           Invitations will be overwritten if provided, do not send if you do not intend to replace. Send blank arrays if you want to remove all of them.<br/>\n           If you want set shipment pickup/arrive range, for example pickup date can be between 1 and 2 July or/and arrive date at 5 July between 12:00 and 18:00, then set both of dates(4 dates in total)<br/>\n           When updated by Shipper and shipment in status of 'confirm', then shipment will be moved to 'propose' status.<br/>\n           It is not possible to update when status >= in_transit.\n",
+          "method": "patch",
+          "nickname": "Api::V1::Shipments#update"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/shipments/{id}.json",
+      "operations": [
+        {
+          "summary": "DELETE a shipment",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Shipment ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "Success"
+            }
+          ],
+          "method": "delete",
+          "nickname": "Api::V1::Shipments#destroy"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "Shipment": {
+      "id": "Shipment",
+      "required": [
+        "dim_w",
+        "dim_h",
+        "dim_l",
+        "distance",
+        "price",
+        "n_of_cartons",
+        "cubic_feet",
+        "unit_count",
+        "skids_count",
+        "pickup_at_from",
+        "arrive_at_from",
+        "shipper_info_id",
+        "receiver_info_id",
+        "auction_end_at"
+      ],
+      "properties": {
+        "po": {
+          "type": "string",
+          "description": "PO"
+        },
+        "pe": {
+          "type": "string",
+          "description": "PE"
+        },
+        "del": {
+          "type": "string",
+          "description": "Del"
+        },
+        "dim_w": {
+          "type": "double",
+          "description": "Width"
+        },
+        "dim_h": {
+          "type": "double",
+          "description": "Height"
+        },
+        "dim_l": {
+          "type": "double",
+          "description": "Length"
+        },
+        "distance": {
+          "type": "integer",
+          "description": "Distance"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes"
+        },
+        "price": {
+          "type": "double",
+          "description": "Price"
+        },
+        "n_of_cartons": {
+          "type": "integer",
+          "description": "Number of cartons"
+        },
+        "cubic_feet": {
+          "type": "integer",
+          "description": "Cubic feet"
+        },
+        "unit_count": {
+          "type": "integer",
+          "description": "Unit count"
+        },
+        "skids_count": {
+          "type": "integer",
+          "description": "Skids count"
+        },
+        "hazard": {
+          "type": "boolean",
+          "description": "Is hazard"
+        },
+        "private_proposing": {
+          "type": "boolean",
+          "description": "Is private auction by link"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Is active"
+        },
+        "stackable": {
+          "type": "boolean",
+          "description": "Is stackable"
+        },
+        "pickup_at_from": {
+          "type": "datetime",
+          "description": "Pickup time(from)"
+        },
+        "arrive_at_from": {
+          "type": "datetime",
+          "description": "Arrive time(from)"
+        },
+        "pickup_at_to": {
+          "type": "datetime",
+          "description": "Pickup time(to), for range"
+        },
+        "arrive_at_to": {
+          "type": "datetime",
+          "description": "Arrive time(to), for range"
+        },
+        "original_shipment_id": {
+          "type": "integer",
+          "description": "Repeated from shipment"
+        },
+        "shipper_info_id": {
+          "type": "integer",
+          "description": "ShipperInfo address ID"
+        },
+        "receiver_info_id": {
+          "type": "integer",
+          "description": "ReceiverInfo address ID"
+        },
+        "secret_id": {
+          "type": "string",
+          "description": "Part for private url"
+        },
+        "auction_end_at": {
+          "type": "datetime",
+          "description": "When shipment stop taking any proposals"
+        },
+        "hide_proposals": {
+          "type": "boolean",
+          "description": "Hide proposals for everyone except owner"
+        },
+        "track_frequency": {
+          "type": "string",
+          "description": "Required tracking frequency update, use: X.INTERVAL, like: 2.hours or 1.day .."
+        }
+      },
+      "description": "Shipment object"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+== README
+
+Welcome to FoxLMP application.
+
+* Database initialization
+After db create and migration you can seed the database, then run `rake swagger:docs` to generate with prefilled demo
+data, start localserver, and browse to /api-doc.
+This will allow you to run different queries alive from apidoc.
+
+Currently swagger will generate json files with demo auth data for shipper user(TODO later add possibility to swith
+users). But you can easily switch that in ApiBaseController (line with finding demo shipper user, switch to email of
+carrier user, see seeds.rb), then rerun rake task for doc regeneration.
+
+* How to run the test suite
+rspec
+After full test you may browse to /coverage/ and see coverage report. Don't let it fall.
+
+* Deployment instructions
+Currently just push to master heroku.
+
+* Live documnetation
+For staging server you can prefill auth data (just like above), you need to seed then run swagger generator.
+For heroku now:
+$ heroku rake db:seed
+$ heroku run rake swagger:docs FOR=heroku
+TODO: heroku not letting to overwrite apidoc json files. find solution for that --> here is workaround:
+The PROBLEM with heroku is that its not letting you overwrite .json files in apidocs folder.
+To solve it you need take out client-id (first key in user.tokens) and access-token (in user.admin_notes) from
+shipper user demo in:
+$ heroku run rails console
+And replace those defaultValue in .json files with search-and-replace
+
+* Admin
+To access and check admin panel you need to:
+- Make seeded shipper user with roles of admin(via console)
+- Regenerate swagger doc(to insert shipper user with admin roles into doc)
+- Peform login via frontend(if ready) OR
+- Go to /api-doc and perform any authorized query - note that auth fields are pre-filled in.
+- Change url to /fox-admin

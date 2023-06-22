@@ -1,0 +1,170 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://foxsoftware.herokuapp.com/",
+  "resourcePath": "users",
+  "apis": [
+    {
+      "path": "api/v1/users/get_address_by_zip.json",
+      "operations": [
+        {
+          "summary": "Find State and City by Zip code (USA)",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "zip",
+              "type": "string",
+              "description": "Zip",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": "Not found"
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "{'zip':'20636','state':'MD','city':'Hollywood','lat':'38.352356','lon':'-76.562644'}"
+            }
+          ],
+          "method": "post",
+          "nickname": "Api::V1::Users#get_address_by_zip"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/users/{id}/stats.json",
+      "operations": [
+        {
+          "summary": "SHOW user statistics",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "User ID",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": null,
+              "message": "StatsObject"
+            },
+            {
+              "code": "unauthorized",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Users#stats"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/users.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            }
+          ],
+          "method": "post",
+          "nickname": "Api::V1::Users#create"
+        }
+      ]
+    },
+    {
+      "path": "api/v1/users/{id}.json",
+      "operations": [
+        {
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "access-token",
+              "type": "string",
+              "description": "Logged in user access token",
+              "required": true,
+              "defaultValue": "ZQ9041w9kHXnc2Zyk3LQ9g"
+            },
+            {
+              "paramType": "header",
+              "name": "uid",
+              "type": "string",
+              "description": "Logged in user UID(uid from oauth or email)",
+              "required": true,
+              "defaultValue": "shipper_demo@xxxxxx.com"
+            },
+            {
+              "paramType": "header",
+              "name": "client",
+              "type": "string",
+              "description": "Cliend ID",
+              "required": true,
+              "defaultValue": "L_ezTiyCEdM0w74AdZ2b9w"
+            },
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "User ID",
+              "required": true
+            }
+          ],
+          "summary": "LOAD user",
+          "responseMessages": [
+            {
+              "code": "not_found",
+              "responseModel": null,
+              "message": null
+            },
+            {
+              "code": "ok",
+              "responseModel": "User",
+              "message": "Success"
+            },
+            {
+              "code": "unauthorized",
+              "responseModel": null,
+              "message": null
+            }
+          ],
+          "method": "get",
+          "nickname": "Api::V1::Users#show"
+        }
+      ]
+    }
+  ]
+}
